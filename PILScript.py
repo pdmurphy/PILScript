@@ -30,7 +30,17 @@ def readIdFile(PILFilePath):
         rowcount = 0
         for row in csvReader:
             print(row)
-            convertedFromCSVToOutput.append("blah") #testing append
+            convertedFromCSVToOutput.append("\n")
+            convertedFromCSVToOutput.append("\n")
+            convertedFromCSVToOutput.append("* ")
+            for column in row:
+                #print(column)
+                convertedFromCSVToOutput.append("\n * ")
+                convertedFromCSVToOutput.append(column)
+                #not quite right as it doesnt do account for first column so you have empty first bullet point
+                #short on time so stop for now. Fairly simple and looks relatively correct otherwise so far.
+                
+            #convertedFromCSVToOutput.append("blah") #testing append
             #convertedFromCSVToOutput += row
             #if(rowcount >= 1):
             #use \n for newlines
