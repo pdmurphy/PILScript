@@ -25,12 +25,12 @@ if(anyArguments):
     setArgs(args.pil_csv)
 
 #reference for specific sections/labels
-#**Purtle's Internet Lineup for March 14th, 2025 3:52pm**
 #**Pics or Text:**
 #**Clips:**
 #**Videos**
 #**Articles/News/Other**
 #* Pokemon news
+#PILScriptTestFile
 
 def readIdFile(PILFilePath):
     with open(PILFilePath) as csvfile:
@@ -40,7 +40,7 @@ def readIdFile(PILFilePath):
             cleanRow = list(filter(None, row)) #filter used to remove empty columns from the row   
             if not cleanRow: #purge rows with no entries
                 #if empty row, skip
-                break
+                continue
             convertedFromCSVToOutput.append("\n")
             convertedFromCSVToOutput.append("\n")
             convertedFromCSVToOutput.append("* ")
