@@ -24,32 +24,34 @@ if(anyArguments):
     args = parser.parse_args()
     setArgs(args.pil_csv)
 
+#reference for specific sections/labels
+#**Purtle's Internet Lineup for March 14th, 2025 3:52pm**
+#**Pics or Text:**
+#**Clips:**
+#**Videos**
+#**Articles/News/Other**
+#* Pokemon news
+
 def readIdFile(PILFilePath):
     with open(PILFilePath) as csvfile:
         csvReader = csv.reader(csvfile, delimiter=',')
-        rowcount = 0
         for row in csvReader:
-            print(row)
+            #print(row) #for debugging
+            cleanRow = list(filter(None, row)) #filter used to remove empty columns from the row   
+            if not cleanRow: #purge rows with no entries
+                #if empty row, skip
+                break
             convertedFromCSVToOutput.append("\n")
             convertedFromCSVToOutput.append("\n")
             convertedFromCSVToOutput.append("* ")
-            for column in row:
-                #print(column)
-                convertedFromCSVToOutput.append("\n * ")
-                convertedFromCSVToOutput.append(column)
-                #not quite right as it doesnt do account for first column so you have empty first bullet point
-                #short on time so stop for now. Fairly simple and looks relatively correct otherwise so far.
-                
-            #convertedFromCSVToOutput.append("blah") #testing append
-            #convertedFromCSVToOutput += row
-            #if(rowcount >= 1):
-            #use \n for newlines
-                #print("Your pil file is incorrect")
-                #exit()
-                # not robust and could be worked around but don't want to deal with it as I don't need it
-            #else:
-                #separateIds(row)
-                #rowcount += 1
+            for i, column in enumerate(cleanRow): 
+                #print (i, column) for debugging
+                #if one of the title spots. then pop/remove? convertedFromCSVToOutput.pop()
+                if i == 0:  #for each new row have a specific start without an extra new line and bullet.
+                    convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
+                else:  # add entry for other parameters
+                    convertedFromCSVToOutput.append("\n * ")
+                    convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
 
 def createOutputFile():
     file = open("pil_script_output.txt", "w")
