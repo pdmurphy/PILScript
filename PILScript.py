@@ -1,6 +1,7 @@
 import csv
 import argparse
 import sys
+from unidecode import unidecode
 
 if len(sys.argv) > 1:
     anyArguments = True
@@ -47,14 +48,17 @@ def readIdFile(PILFilePath):
             for i, column in enumerate(cleanRow): 
                 #print (i, column) for debugging
                 #if one of the title spots. then pop/remove? convertedFromCSVToOutput.pop()
+                column = unidecode(column)
                 if i == 0:  #for each new row have a specific start without an extra new line and bullet.
                     convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
-                else:  # add entry for other parameters
+                else:  #add entry for other parameters
                     convertedFromCSVToOutput.append("\n * ")
                     convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
 
 def createOutputFile():
     file = open("pil_script_output.txt", "w")
+    file.write(''.join(convertedFromCSVToOutput)) 
+    file.close()
     #yadda yadda 
 #notes for writing the file later. Also could just be a printout intitially as well.
 ## Method 1
