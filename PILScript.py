@@ -50,7 +50,14 @@ def readIdFile(PILFilePath):
                 #if one of the title spots. then pop/remove? convertedFromCSVToOutput.pop()
                 column = unidecode(column)
                 if i == 0:  #for each new row have a specific start without an extra new line and bullet.
-                    convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
+                    if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other"):
+                        #need to pop first to remove the space + *
+                        convertedFromCSVToOutput.pop() #this removes the bullet already created since the categories shouldn't be a bullet.
+                        ##############need to decide if yes on colon or no. 
+                        ##############Just realized clips and pics usually do but videos and articles usually didnt. Maybe go back in time and check some old ones
+                        convertedFromCSVToOutput.append("**" + column.lstrip() + "**")
+                    else:
+                        convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
                 else:  #add entry for other parameters
                     convertedFromCSVToOutput.append("\n * ")
                     convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
