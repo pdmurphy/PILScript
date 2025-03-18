@@ -59,6 +59,9 @@ def readIdFile(PILFilePath):
                 else:  #add entry for other parameters
                     convertedFromCSVToOutput.append("\n * ")
                     convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
+    #delete initial two newlines. Could do same behavior with a if statement checking index but I did it this way to learn how to delete from front of a list.
+    del convertedFromCSVToOutput[0]
+    del convertedFromCSVToOutput[0]
 
 def createOutputFile():
     file = open("pil_script_output.txt", "w")
