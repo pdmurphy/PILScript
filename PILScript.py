@@ -74,5 +74,9 @@ def createOutputFile():
 #f.write("Hello World from " + f.name)    # Write inside file 
 #f.close()                                # Close file 
 
-readIdFile(PILCSVFilepath)
-print(''.join(convertedFromCSVToOutput))
+if(anyArguments):
+    readIdFile(PILCSVFilepath)
+    print(''.join(convertedFromCSVToOutput))
+else:
+    #testIds()
+    print("test time")

@@ -1,0 +1,35 @@
+**Pics or Text:**
+
+* Test file http://purtle.stream/
+ * another link http://purtle.stream/
+ * third http://purtle.stream/
+
+* Just some text
+
+* space in front
+ * space in front on 2nd column
+
+**Clips:**
+
+* empty row above me
+ * 2nd column after empty row
+
+* another row
+
+* new row does this mess up the excel
+ * lets see
+
+**Videos:**
+
+**Articles/News/Other:**
+
+* apostraphe test. Programmer's program.
+
+* quotation test. The programmer said "that bug is bugging me"
+
+* Broken apostraphe test. 'this didn't work before'
+
+* quote broken test "abcdefg"
+
+* testing not bolding if somehow the column has same as a category
+ * Pics or Text:
