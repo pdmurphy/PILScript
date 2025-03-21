@@ -29,8 +29,8 @@ class TestPILScript(unittest.TestCase):
         self.assertEqual("Broken apostraphe test. 'this didn't work before'", convertedFromCSVToOutput[55], "should be Broken apostraphe test. 'this didn't work before'")
         self.assertEqual("quote broken test \"abcdefg\"", convertedFromCSVToOutput[59], "should be quote broken test \"abcdefg\"")
 
-    def test_full_output(self):
-    	print("Testing full output")
+    def test_full_printed_output(self):
+    	print("Testing printed output")
     	with open(testComparisonPath, 'r') as file:
     		file_content = file.read()
     		self.assertEqual(file_content, ''.join(convertedFromCSVToOutput), file_content)
