@@ -3,6 +3,7 @@ import argparse
 import sys
 from unidecode import unidecode
 
+#check if arguments exist
 if len(sys.argv) > 1:
     anyArguments = True
 else:
@@ -18,6 +19,7 @@ def setArgs(PILCSVArg, textOutputArg):
     PILCSVFilepath = PILCSVArg
     global textOutputBoolean
     textOutputBoolean = textOutputArg
+
 #parse arguments if they exist
 if(anyArguments):
     parser = argparse.ArgumentParser(description="Converts CSV to formatted text for PIL.", add_help=False)
@@ -31,6 +33,7 @@ if(anyArguments):
     args = parser.parse_args()
     setArgs(args.pil_csv, args.text_output)
 
+#function that reads and parses the file, filling the list with the formatted output.
 def readIdFile(PILFilePath):
     with open(PILFilePath) as csvfile:
         csvReader = csv.reader(csvfile, delimiter=',')
@@ -44,7 +47,6 @@ def readIdFile(PILFilePath):
             convertedFromCSVToOutput.append("\n")
             convertedFromCSVToOutput.append("* ")
             for i, column in enumerate(cleanRow): 
-                #print (i, column) for debugging
                 column = unidecode(column)
                 if i == 0:  #for each new row have a specific start without an extra new line and bullet.
                     #reference for specific sections/labels
@@ -65,12 +67,14 @@ def readIdFile(PILFilePath):
     del convertedFromCSVToOutput[0]
     del convertedFromCSVToOutput[0]
 
+#single file creation. Will overwrite the file if it already exists.
 def createOutputFile():
     file = open("pil_script_output.txt", "w")
     file.write(''.join(convertedFromCSVToOutput)) 
     file.close()
 
-if(anyArguments):
+#code that starts the processes. Depending on arguments will perform different functions
+if(anyArguments): #if no arguments it will skip and run the tests but not running anything in here.
     readIdFile(PILCSVFilepath)
     if(textOutputBoolean):
         createOutputFile()
