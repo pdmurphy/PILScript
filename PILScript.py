@@ -2,6 +2,7 @@ import csv
 import argparse
 import sys
 from unidecode import unidecode
+from datetime import datetime
 
 #check if arguments exist
 if len(sys.argv) > 1:
@@ -33,10 +34,29 @@ if(anyArguments):
     args = parser.parse_args()
     setArgs(args.pil_csv, args.text_output)
 
+#helper function to Convert an integer into its ordinal representation for date.
+def make_ordinal(n):
+    #seems wild there isn't a way to get the ordinal prefix for days but after searching it seems most use custom functions.
+    n = int(n)
+    if 11 <= (n % 100) <= 13:
+        suffix = 'th'
+    else:
+        suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+    return str(n) + suffix
+
+#helper function to parse date and return date as text in desired format
+def parseDateToText(dateNow):
+    #if error you will have to remove # before d and I which remove the leading 0.
+    #possibly you can do %-d and %-I if on linux to still remove leading 0
+    #convertedFromCSVToOutput.append(datetime.now().strftime('%B %#d, %Y %#I:%M%p'))
+    return f"{dateNow.strftime('%B')} {make_ordinal(dateNow.strftime('%#d'))}, {dateNow.strftime('%Y %#I:%M%p')}"
+
 #function that reads and parses the file, filling the list with the formatted output.
 def readIdFile(PILFilePath):
     with open(PILFilePath) as csvfile:
         csvReader = csv.reader(csvfile, delimiter=',')
+        #add the title line with date at the top
+        convertedFromCSVToOutput.append("**"+ parseDateToText(datetime.now()) + "**")
         for row in csvReader:
             #print(row) #for debugging
             cleanRow = list(filter(None, row)) #filter used to remove empty columns from the row   
@@ -63,9 +83,6 @@ def readIdFile(PILFilePath):
                 else:  #add entry for other parameters
                     convertedFromCSVToOutput.append("\n * ")
                     convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
-    #delete initial two newlines. Could do same behavior with a if statement checking index but I did it this way to learn how to delete from front of a list.
-    del convertedFromCSVToOutput[0]
-    del convertedFromCSVToOutput[0]
 
 #single file creation. Will overwrite the file if it already exists.
 def createOutputFile():
