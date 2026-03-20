@@ -74,7 +74,7 @@ def readIdFile(PILFilePath):
                     #**Clips:**
                     #**Videos**
                     #**Articles/News/Other**
-                    if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other:"):
+                    if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other:") or column.__eq__("Uncategorized news:"):
                         #need to pop first to remove the space + *
                         convertedFromCSVToOutput.pop() #this removes the bullet already created since the categories shouldn't be a bullet.
                         convertedFromCSVToOutput.append("**" + column.lstrip() + "**") #adding the double star formatting.
