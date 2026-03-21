@@ -71,7 +71,7 @@ def readIdFile(PILFilePath):
                 column = unidecode(column)
                 column = column.lstrip() #lstrip removes leading spaces
                 if column.startswith("https:") and "reddit.com" in column: #check for just being reddit url w/o caption or other text
-                    column = RedditPostInfo.format_reddit_post(column)
+                    column = unidecode(RedditPostInfo.format_reddit_post(column))
                 if i == 0:  #for each new row have a specific start without an extra new line and bullet.
                     if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other:") or column.__eq__("Uncategorized News:"):
                         #need to pop first to remove the space + *

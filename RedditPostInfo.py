@@ -1,5 +1,6 @@
 import requests
 from urllib.parse import urlparse
+from unidecode import unidecode #if using unidecode version
 
 REDDIT_DOMAINS = {"reddit.com", "v.redd.it", "i.redd.it"}
 
@@ -27,6 +28,11 @@ def format_reddit_post(reddit_url: str) -> str:
 
     if is_external:
         domain_display = domain[0].upper() + domain[1:] if domain else ""
+        #if you get problems with using the resulting strings that come out of this function. 
+        #try using this version
+        #return unidecode(f"{prefix}{title} - {domain_display} {reddit_url}") 
+    #else:
+        #return unidecode(f"{prefix}{title} {reddit_url}")
         return f"{prefix}{title} - {domain_display} {reddit_url}"
     else:
         return f"{prefix}{title} {reddit_url}"
