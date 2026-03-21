@@ -1,0 +1,29 @@
+import requests
+from urllib.parse import urlparse
+
+
+def format_reddit_post(reddit_url: str) -> str:
+    base_url = reddit_url.rstrip("/")
+    json_url = base_url + ".json"
+
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; reddit-helper/1.0)"}
+    response = requests.get(json_url, headers=headers)
+    response.raise_for_status()
+
+    data = response.json()
+
+    post = data[0]["data"]["children"][0]["data"]
+
+    title = post["title"]
+    external_url = post.get("url", "")
+    is_self_post = post.get("is_self", False)
+    is_video = post.get("is_video", False)
+
+    prefix = "[clip] " if is_video else ""
+
+    if not is_self_post and "reddit.com" not in external_url:
+        domain = urlparse(external_url).netloc.removeprefix("www.")
+        domain_display = domain[0].upper() + domain[1:] if domain else ""
+        return f"{prefix}{title} - {domain_display} {reddit_url}"
+    else:
+        return f"{prefix}{title} {reddit_url}"
