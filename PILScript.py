@@ -1,6 +1,7 @@
 import csv
 import argparse
 import sys
+import RedditPostInfo
 from unidecode import unidecode
 from datetime import datetime
 
@@ -68,21 +69,19 @@ def readIdFile(PILFilePath):
             convertedFromCSVToOutput.append("* ")
             for i, column in enumerate(cleanRow): 
                 column = unidecode(column)
+                column = column.lstrip() #lstrip removes leading spaces
+                if column.startswith("https:") and "reddit.com" in column: #check for just being reddit url w/o caption or other text
+                    column = RedditPostInfo.format_reddit_post(column)
                 if i == 0:  #for each new row have a specific start without an extra new line and bullet.
-                    #reference for specific sections/labels
-                    #**Pics or Text:**
-                    #**Clips:**
-                    #**Videos**
-                    #**Articles/News/Other**
-                    if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other:") or column.__eq__("Uncategorized news:"):
+                    if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other:") or column.__eq__("Uncategorized News:"):
                         #need to pop first to remove the space + *
                         convertedFromCSVToOutput.pop() #this removes the bullet already created since the categories shouldn't be a bullet.
-                        convertedFromCSVToOutput.append("**" + column.lstrip() + "**") #adding the double star formatting.
+                        convertedFromCSVToOutput.append("**" + column + "**")#adding the double star formatting.
                     else: #otherwise no extra new line
-                        convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
+                        convertedFromCSVToOutput.append(column)
                 else:  #add entry for other parameters
                     convertedFromCSVToOutput.append("\n * ")
-                    convertedFromCSVToOutput.append(column.lstrip()) #lstrip removes leading spaces
+                    convertedFromCSVToOutput.append(column) 
 
 #single file creation. Will overwrite the file if it already exists.
 def createOutputFile():
