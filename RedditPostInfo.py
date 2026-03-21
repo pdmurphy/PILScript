@@ -1,6 +1,7 @@
 import requests
 from urllib.parse import urlparse
 
+REDDIT_DOMAINS = {"reddit.com", "v.redd.it", "i.redd.it"}
 
 def format_reddit_post(reddit_url: str) -> str:
     base_url = reddit_url.rstrip("/")
@@ -21,8 +22,10 @@ def format_reddit_post(reddit_url: str) -> str:
 
     prefix = "[clip] " if is_video else ""
 
-    if not is_self_post and "reddit.com" not in external_url:
-        domain = urlparse(external_url).netloc.removeprefix("www.")
+    domain = urlparse(external_url).netloc.removeprefix("www.")
+    is_external = not is_self_post and not any(domain.endswith(d) for d in REDDIT_DOMAINS)
+
+    if is_external:
         domain_display = domain[0].upper() + domain[1:] if domain else ""
         return f"{prefix}{title} - {domain_display} {reddit_url}"
     else:
