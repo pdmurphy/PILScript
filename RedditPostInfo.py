@@ -9,8 +9,14 @@ def format_reddit_post(reddit_url: str) -> str:
     json_url = base_url + ".json"
 
     headers = {"User-Agent": "Mozilla/5.0 (compatible; reddit-helper/1.0)"}
-    response = requests.get(json_url, headers=headers)
-    response.raise_for_status()
+    try:
+        response = requests.get(json_url, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if response.status_code == 429:
+            print("Rate limited by Reddit (429). Skipping this URL. " + reddit_url)
+            return None
+        raise
 
     data = response.json()
 
