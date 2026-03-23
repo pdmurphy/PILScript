@@ -56,8 +56,7 @@ def parseDateToText(dateNow):
 def readIdFile(PILFilePath):
     with open(PILFilePath) as csvfile:
         csvReader = csv.reader(csvfile, delimiter=',')
-        #add the title line with date at the top
-        convertedFromCSVToOutput.append("**"+ parseDateToText(datetime.now()) + "**")
+        #add the title line with date at the top at the end so that it's timing is more accurate to when the script is completed
         for row in csvReader:
             #print(row) #for debugging
             cleanRow = list(filter(None, row)) #filter used to remove empty columns from the row   
@@ -88,7 +87,8 @@ def readIdFile(PILFilePath):
                 else:  #add entry for other parameters
                     convertedFromCSVToOutput.append("\n * ")
                     convertedFromCSVToOutput.append(column) 
-
+        convertedFromCSVToOutput.insert(0,"**"+ parseDateToText(datetime.now()) + "**") #add the title line with date at the top now for accurate timing
+        
 #single file creation. Will overwrite the file if it already exists.
 def createOutputFile():
     file = open("pil_script_output.txt", "w")
