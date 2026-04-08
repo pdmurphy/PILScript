@@ -16,6 +16,9 @@ def format_reddit_post(reddit_url: str) -> str:
         if response.status_code == 429:
             print("Rate limited by Reddit (429). Skipping this URL. " + reddit_url)
             return None
+        else:
+            print("Other error when using url: " + json_url + " status code " + response.status_code )
+            return None
         raise
 
     data = response.json()
