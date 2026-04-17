@@ -72,11 +72,6 @@ def readIdFile(PILFilePath):
             for i, column in enumerate(cleanRow): 
                 column = unidecode(column)
                 column = column.lstrip() #lstrip removes leading spaces
-                # if i == 0:
-                #     twitter_formatted =  TwitterPostInfo.format_tweet("TEST TWEET URL HERE")
-                #     column = unidecode(twitter_formatted)
-                #     print(twitter_formatted)
-                #     quit()
                 if column.startswith("https:") and "reddit.com" in column: #check for just being reddit url w/o caption or other text
                     if not rate_limited_reddit:
                         reddit_formatted =  RedditPostInfo.format_reddit_post(column)
