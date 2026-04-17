@@ -2,6 +2,7 @@ import csv
 import argparse
 import sys
 import RedditPostInfo
+import TwitterPostInfo
 from unidecode import unidecode
 from datetime import datetime
 
@@ -60,7 +61,8 @@ def readIdFile(PILFilePath):
         for row in csvReader:
             #print(row) #for debugging
             cleanRow = list(filter(None, row)) #filter used to remove empty columns from the row   
-            rate_limited = False
+            rate_limited_reddit = False
+            rate_limited_twitter = False
             if not cleanRow: #purge rows with no entries
                 #if empty row, skip
                 continue
@@ -70,13 +72,25 @@ def readIdFile(PILFilePath):
             for i, column in enumerate(cleanRow): 
                 column = unidecode(column)
                 column = column.lstrip() #lstrip removes leading spaces
+                # if i == 0:
+                #     twitter_formatted =  TwitterPostInfo.format_tweet("TEST TWEET URL HERE")
+                #     column = unidecode(twitter_formatted)
+                #     print(twitter_formatted)
+                #     quit()
                 if column.startswith("https:") and "reddit.com" in column: #check for just being reddit url w/o caption or other text
-                    if not rate_limited:
+                    if not rate_limited_reddit:
                         reddit_formatted =  RedditPostInfo.format_reddit_post(column)
                         if reddit_formatted is None:
-                            rate_limited = True
+                            rate_limited_reddit = True
                         else:
                             column = unidecode(reddit_formatted)
+                if column.startswith("https:") and ("x.com" in column or "twitter.com" in column): #check for just being twitter url w/o caption or other text
+                   if not rate_limited_twitter:
+                       twitter_formatted =  TwitterPostInfo.format_tweet(column)
+                       if twitter_formatted is None:
+                           rate_limited_twitter = True
+                       else:
+                           column = unidecode(twitter_formatted)
                 if i == 0:  #for each new row have a specific start without an extra new line and bullet.
                     if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other:") or column.__eq__("Uncategorized News:"):
                         #need to pop first to remove the space + *
