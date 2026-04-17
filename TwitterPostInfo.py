@@ -1,72 +1,45 @@
-import requests
-import time
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
+#from playwright_stealth import stealth_sync
 from urllib.parse import urlparse
 
-NITTER_INSTANCES = [
-    "https://nitter.net",
-    "https://nitter.privacydev.net",
-    "https://nitter.poast.org",
-]
-
 def format_tweet(twitter_url: str) -> str:
-    # Extract the path from the twitter/x URL to build nitter URL
-    path = urlparse(twitter_url).path
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False) #true is trying stealth sync
+        page = browser.new_page()
+        #stealth_sync(page)
 
-#THIS CURRENTLY DOES NOT WORK DESPITE MULTIPLE CHANGES. 
-
-    html = None
-    for instance in NITTER_INSTANCES:
         try:
-            nitter_url = instance + path
-            headers = {"User-Agent": "Mozilla/5.0 (compatible; tweet-helper/1.0)"}
-            session = requests.Session()
-            # "Visit" the homepage first to pick up any required cookies
-            session.get(instance, headers=headers, timeout=10)
-            # Then fetch the actual tweet
-            response = session.get(nitter_url, headers=headers, timeout=15, allow_redirects=True)
-            #response = requests.get(nitter_url, headers=headers, timeout=15, allow_redirects=True)
-            time.sleep(3)  # Give it a moment to settle
-            if response.status_code == 429:
-                print("Rate limited by Twitter/Nitter (429). Skipping this URL. " + nitter_url)
-                return None
-            if response.status_code == 200:
-                print(response.content)
-                print("htmltext")
-                print(response.text)
-                html = response.content
-                break
-        except requests.exceptions.RequestException:
-            print("request exception")
-            continue  # Try next instance
+            page.goto(twitter_url, wait_until="domcontentloaded", timeout=30000)
+        except Exception as e:
+            print(f"Failed to load tweet page: {e}")
+            browser.close()
+            return None
 
-    if html is None:
-        print("All Nitter instances failed or are unavailable. Skipping.")
-        return None
+        # Wait for the tweet text to appear
+        try:
+            page.wait_for_selector("[data-testid='tweetText']", timeout=15000)
+        except Exception:
+            print("Could not find tweet content. Skipping.")
+            browser.close()
+            return None
 
-    soup = BeautifulSoup(html, "html.parser")
+        # Get tweet text and replace newlines
+        # print("debugs")
+        # print( page.locator("[data-testid='tweetText']"))
+        # print("Page title:", page.title())
+        # print("Page URL:", page.url)
+        tweet_el = page.locator("[data-testid='tweetText']")
+        print("count " + str(page.locator("[data-testid='tweetText']").count()))
+        is_quote_tweet = page.locator("[data-testid='tweetText']").count() > 1
+        print(is_quote_tweet)
+        text = tweet_el.first.inner_text().replace("\n", " | ")
+# page.locator("[data-testid='tweetText']").first.inner_text().replace("\n", " | ")
+#text = tweet_el.inner_text().replace("\n", " | ")
+        # Detect media
+        has_video = page.locator("[data-testid='videoPlayer']") is not None
+        has_image = page.locator("[data-testid='tweetPhoto']") is not None
 
-    for tag in soup.find_all("div", class_=True):
-        print("tag " + tag)
-        print(tag["class"], "-->", tag.get_text(strip=True)[:80])
-
-    # data = requests.get("https://www.uniprot.org/uniprot/P28653.fasta").content
-    # print(data)
-
-    print(soup.find_all)
-    print("findall above^")
-
-    # Tweet text lives in div.tweet-content
-    content_div = soup.find("div", class_="tweet-content")
-    if not content_div:
-        print("Could not find tweet content. Skipping.")
-        return None
-
-    text = content_div.get_text(strip=True).replace("\n", " | ")
-
-    # Detect media type
-    has_video = soup.find("div", class_="attachment video-container") is not None
-    has_image = soup.find("div", class_="attachment image") is not None
+        browser.close()
 
     if has_video:
         prefix = "[clip] "
@@ -75,4 +48,9 @@ def format_tweet(twitter_url: str) -> str:
     else:
         prefix = ""
 
+    if is_quote_tweet:
+        prefix = "[quotetweet]" + prefix
+
+    # print("prefix " + prefix)
+    # print("text + " + text)
     return f"{prefix}{text} {twitter_url}"
