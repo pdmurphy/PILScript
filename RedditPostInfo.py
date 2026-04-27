@@ -5,7 +5,7 @@ from unidecode import unidecode #if using unidecode version
 REDDIT_DOMAINS = {"reddit.com", "v.redd.it", "i.redd.it"}
 
 def format_reddit_post(reddit_url: str) -> str:
-    base_url = reddit_url.rstrip("/")
+    base_url = reddit_url.rsplit('/', 1)[0]
     json_url = base_url + ".json"
 
     headers = {"User-Agent": "Mozilla/5.0 (compatible; reddit-helper/1.0)"}
