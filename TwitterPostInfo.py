@@ -20,7 +20,7 @@ def format_tweet(twitter_url: str) -> str:
         try:
             page.wait_for_selector("[data-testid='tweetText']", timeout=15000)
         except Exception:
-            print("Could not find tweet content. Skipping.")
+            print("Could not find tweet content. Skipping. " + twitter_url) 
             browser.close()
             return None
 
