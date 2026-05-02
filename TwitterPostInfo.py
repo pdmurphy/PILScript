@@ -31,8 +31,8 @@ def format_tweet(twitter_url: str) -> str:
         text = tweet_el.first.inner_text().replace("\n", " | ")
 
         # Detect media
-        has_video = page.locator("[data-testid='videoPlayer']") is not None
-        has_image = page.locator("[data-testid='tweetPhoto']") is not None
+        has_video = page.locator("[data-testid='videoPlayer']").count() > 0
+        has_image = page.locator("[data-testid='tweetPhoto']").count() > 0
 
         browser.close()
 
