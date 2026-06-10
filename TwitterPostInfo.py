@@ -17,23 +17,25 @@ def format_tweet(twitter_url: str) -> str:
 
     # Wait for the tweet text to appear
     try:
-        page.wait_for_selector("[data-testid='tweetText']", timeout=15000)
+        # Wait for the article to load instead
+        page.wait_for_selector("article", timeout=15000)
     except Exception:
         print("Could not find tweet content. Skipping. " + twitter_url) 
         browser.close()
         return None
 
     # Get tweet text and replace newlines
-    tweet_el = page.locator("[data-testid='tweetText']")
+    #tweet_el = page.locator("[data-testid='tweetText']")
     #check if quote tweet and set boolean flag. if locator finds more than 1 result. 
-    is_quote_tweet = page.locator("[data-testid='tweetText']").count() > 1 
-    text = tweet_el.first.inner_text().replace("\n", " | ")
+    is_quote_tweet = page.locator("article div[data-href]").count() > 0
+    # Tweet text - first dir=auto div inside article
+    text = page.locator("article div[dir='auto']").first.inner_text().replace("\n", " | ")
 
     # Detect media
     # Give media elements time to load after tweet text appears
     page.wait_for_timeout(200)
-    has_video = page.locator("[data-testid='videoPlayer']").count() > 0
-    has_image = page.locator("[data-testid='tweetPhoto']").count() > 0
+    has_video = page.locator("article video").count() > 0
+    has_image = page.locator("article a[aria-label='Image']").count() > 0
 
     page.close()
 
