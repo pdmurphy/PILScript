@@ -19,6 +19,12 @@ def format_tweet(twitter_url: str) -> str:
     try:
         # Wait for the article to load instead
         page.wait_for_selector("article", timeout=15000)
+        # DEBUG - uncomment if twitter parsing breaks to find new selectors
+        # page.wait_for_timeout(5000)
+        # html = page.locator("body").inner_html()
+        # with open("debug_tweet.html", "w", encoding="utf-8") as f:
+        #     f.write(html)
+        # print("HTML saved to debug_tweet.html")
     except Exception:
         print("Could not find tweet content. Skipping. " + twitter_url) 
         browser.close()
