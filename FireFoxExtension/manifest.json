@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+  "name": "Reddit & Twitter Post Formatter",
+  "version": "1.1",
+  "description": "Copies a formatted Reddit or Twitter/X post string to clipboard.",
+
+  "icons": {
+    "48": "icon.png"
+  },
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "Copy Post Info",
+    "default_popup": "popup.html"
+  },
+
+  "permissions": [
+    "activeTab",
+    "clipboardWrite"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.reddit.com/*",
+        "*://*.old.reddit.com/*",
+        "*://twitter.com/*",
+        "*://x.com/*"
+      ],
+      "js": ["content.js"]
+    }
+  ]
+}
