@@ -3,6 +3,7 @@ from playwright.sync_api import sync_playwright
 from urllib.parse import urlparse
 #not implementing headless currently.
 from BrowserUtility import get_browser
+import re
 
 def format_tweet(twitter_url: str) -> str:
     browser = get_browser()
@@ -35,7 +36,9 @@ def format_tweet(twitter_url: str) -> str:
     #check if quote tweet and set boolean flag. if locator finds more than 1 result. 
     is_quote_tweet = page.locator("article div[data-href]").count() > 0
     # Tweet text - first dir=auto div inside article
-    text = page.locator("article div[dir='auto']").first.inner_text().replace("\n", " | ")
+    raw_text = page.locator("article div[dir='auto']").first.text_content()
+    text = re.sub(r"\s*\n\s*", " | ", raw_text).strip()
+    text = re.sub(r"\|\s*\|", "|", text)  # only collapse doubles pipes with whitespace (empty gap) in case the tweet has double pipes itself.
 
     # Detect media
     # Give media elements time to load after tweet text appears
