@@ -49,6 +49,7 @@ function getRedditPostData() {
 
   return { error: "Could not extract post data from page." };
 }
+
 function getTweetData() {
   const url = window.location.href;
 
@@ -77,7 +78,11 @@ function getTweetData() {
   const hasVideo = article.querySelector("video") !== null ||
                     article.querySelector("[data-testid='previewInterstitial']") !== null;
   const hasImage = !hasVideo && article.querySelector("a[aria-label='Image']") !== null;
-  const isQuoteTweet = article.querySelector("div[data-href]") !== null;
+
+  // Quote tweets show a literal "Quote" label span right before the embedded quoted tweet's container
+  const isQuoteTweet = Array.from(article.querySelectorAll("span")).some(
+    span => span.textContent.trim() === "Quote"
+  );
 
   return { text, hasVideo, hasImage, isQuoteTweet, url };
 }
