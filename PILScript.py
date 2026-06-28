@@ -3,6 +3,8 @@ import argparse
 import sys
 import RedditPostInfo
 import TwitterPostInfo
+import BlueSkyPostInfo
+from BrowserUtility import close_browser
 from unidecode import unidecode
 from datetime import datetime
 
@@ -63,6 +65,7 @@ def readIdFile(PILFilePath):
             cleanRow = list(filter(None, row)) #filter used to remove empty columns from the row   
             rate_limited_reddit = False
             rate_limited_twitter = False
+            rate_limited_bluesky = False
             if not cleanRow: #purge rows with no entries
                 #if empty row, skip
                 continue
@@ -86,6 +89,13 @@ def readIdFile(PILFilePath):
                            rate_limited_twitter = True
                        else:
                            column = unidecode(twitter_formatted)
+                if column.startswith("https:") and ("bsky.app" in column): #check for just being bluesky url w/o caption or other text
+                   if not rate_limited_bluesky:
+                       bluesky_formatted =  BlueSkyPostInfo.format_bluesky_post(column)
+                       if bluesky_formatted is None:
+                           rate_limited_bluesky = True
+                       else:
+                           column = unidecode(bluesky_formatted)
                 if i == 0:  #for each new row have a specific start without an extra new line and bullet.
                     if column.__eq__("Pics or Text:") or column.__eq__("Clips:") or column.__eq__("Videos:") or column.__eq__("Articles/News/Other:") or column.__eq__("Uncategorized News:"):
                         #need to pop first to remove the space + *
@@ -107,6 +117,7 @@ def createOutputFile():
 #code that starts the processes. Depending on arguments will perform different functions
 if(anyArguments): #if no arguments it will skip and run the tests but not running anything in here.
     readIdFile(PILCSVFilepath)
+    close_browser()
     if(textOutputBoolean):
         createOutputFile()
     else:
