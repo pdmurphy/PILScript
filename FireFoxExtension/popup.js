@@ -32,6 +32,29 @@ function formatTweetResult(tweet) {
   return `${prefix}${text} ${pageUrl}`;
 }
 
+
+function formatBlueskyResult(post) {
+  const text     = post.text || "";
+  const hasVideo = post.hasVideo || false;
+  const hasImage = post.hasImage || false;
+  const isQuote  = post.isQuote || false;
+  const pageUrl  = post.url;
+ 
+  let prefix = "";
+  if (hasVideo) {
+    prefix = "[clip] ";
+  } else if (hasImage) {
+    prefix = "[pic] ";
+  }
+  if (isQuote) {
+    // [quote], not [quotetweet] since its not a tweet
+    prefix = "[quote] " + prefix;
+  }
+ 
+  return `${prefix}${text} ${pageUrl}`;
+}
+
+
 function formatResult(post) {
   const title    = post.title || "Unknown Title";
   const linkHref = post.linkHref || "";
@@ -61,19 +84,27 @@ async function run() {
 
   const isReddit  = /reddit\.com\/r\/[^/]+\/comments\//.test(tab.url);
   const isTwitter = /(twitter\.com|x\.com)\/[^/]+\/status\//.test(tab.url);
+   const isBluesky = /bsky\.app\/profile\/[^/]+\/post\//.test(tab.url);
 
-  if (!isReddit && !isTwitter) {
-    statusEl.textContent = "Not a Reddit post or Tweet page.";
+  if (!isReddit && !isTwitter && !isBluesky) {
+    statusEl.textContent = "Not a Reddit post or Tweet, or Bluesky post page.";
     statusEl.className = "error";
     return;
   }
 
+
+  let action;
+  if (isReddit) {
+    action = "getPostData";
+  } else if (isTwitter) {
+    action = "getTweetData";
+  } else {
+    action = "getBlueskyData";
+  }
+
   let data;
   try {
-    data = await browser.tabs.sendMessage(
-      tab.id,
-      { action: isReddit ? "getPostData" : "getTweetData" }
-    );
+    data = await browser.tabs.sendMessage(tab.id, { action });
   } catch (err) {
     statusEl.textContent = "Could not read page. Try refreshing it.";
     statusEl.className = "error";
@@ -86,7 +117,14 @@ async function run() {
     return;
   }
 
-  const formatted = isReddit ? formatResult(data) : formatTweetResult(data);
+  let formatted;
+  if (isReddit) {
+    formatted = formatResult(data);
+  } else if (isTwitter) {
+    formatted = formatTweetResult(data);
+  } else {
+    formatted = formatBlueskyResult(data);
+  }
 
   try {
     await navigator.clipboard.writeText(formatted);

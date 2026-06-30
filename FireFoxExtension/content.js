@@ -68,9 +68,7 @@ function getTweetData() {
   if (!textEl) {
     return { error: "Could not find tweet text on page." };
   }
-  //Use textContent instead of innerText - innerText inserts line breaks at
-  //block-level element boundaries (like the divs wrapping @mentions), even
-  //though there's no actual newline in the tweet. textContent avoids that.
+  //Use textContent instead of innerText to help about line break issues.
   const text = textEl.textContent.replace(/\s*\n\s*/g, " | ").trim();
 
   //<video> tag only mounts once playback starts - before that,
@@ -87,11 +85,49 @@ function getTweetData() {
   return { text, hasVideo, hasImage, isQuoteTweet, url };
 }
 
+// Bluesky we have to read via  <meta property="og:..."> 
+// distinguish own-image vs own-video vs quote-post vs quote-with-own-media:
+//   - og:image path contains "feed_thumbnail" -> post has its own image
+//   - og:image path contains "avatar_thumbnail" (or no og:image) -> no own image
+//   - og:video present -> post has its own video
+//   - og:description containing the literal "[contains quote post or other
+//     embedded content]" marker -> post is quoting/embedding another post
+// These two signals are independent, so a post can be both (own image/video
+// AND a quote) - confirmed against a real recordWithMedia example.
+function getBlueskyPostData() {
+  const url = window.location.href;
+ 
+  const ogImage = document.querySelector('meta[property="og:image"]')?.content || "";
+  const ogVideo = document.querySelector('meta[property="og:video"]')?.content || "";
+  const ogDesc  = document.querySelector('meta[property="og:description"]')?.content || "";
+ 
+  if (!ogDesc) {
+    return { error: "Could not find post data on page." };
+  }
+ 
+  const QUOTE_MARKER = "[contains quote post or other embedded content]";
+  const isQuote = ogDesc.includes(QUOTE_MARKER);
+ 
+  // Strip the marker (and the blank line bskyweb puts before it) back out of
+  // the description so it isn't included as if it were part of the post text.
+  const text = ogDesc.replace(QUOTE_MARKER, "").trim();
+  //  const text = const text = ogDesc
+  // .replace(/\s*\n\s*/g, " | ")
+  // .replace(QUOTE_MARKER, "")
+  // .trim();
+  const hasVideo = !!ogVideo;
+  const hasImage = !hasVideo && ogImage.includes("/feed_thumbnail/");
+ 
+  return { text, hasVideo, hasImage, isQuote, url };
+}
+
 //Listen for message from popup
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "getPostData") {
     sendResponse(getRedditPostData());
   } else if (msg.action === "getTweetData") {
     sendResponse(getTweetData());
+  } else if (msg.action === "getBlueskyData") {
+    sendResponse(getBlueskyPostData());
   }
 });

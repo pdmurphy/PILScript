@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Reddit & Twitter Post Formatter",
+  "name": "Social Media Post Formatter",
   "version": "1.1",
-  "description": "Copies a formatted Reddit or Twitter/X post string to clipboard.",
+  "description": "Copies a formatted social media site post string to clipboard.",
 
   "icons": {
     "48": "icon.png"
@@ -22,6 +22,7 @@
   "content_scripts": [
     {
       "matches": [
+        "*://*.bsky.app/*",
         "*://*.reddit.com/*",
         "*://*.old.reddit.com/*",
         "*://twitter.com/*",
