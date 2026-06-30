@@ -110,11 +110,8 @@ function getBlueskyPostData() {
  
   // Strip the marker (and the blank line bskyweb puts before it) back out of
   // the description so it isn't included as if it were part of the post text.
-  const text = ogDesc.replace(QUOTE_MARKER, "").trim();
-  //  const text = const text = ogDesc
-  // .replace(/\s*\n\s*/g, " | ")
-  // .replace(QUOTE_MARKER, "")
-  // .trim();
+  const text = ogDesc.replace(/\s*\n\s*/g, " | ").replace(QUOTE_MARKER, "").trim();
+
   const hasVideo = !!ogVideo;
   const hasImage = !hasVideo && ogImage.includes("/feed_thumbnail/");
  
