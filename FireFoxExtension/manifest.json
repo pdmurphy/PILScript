@@ -23,6 +23,7 @@
     {
       "matches": [
         "*://*.bsky.app/*",
+        "*://*.youtube.com/*",
         "*://*.reddit.com/*",
         "*://*.old.reddit.com/*",
         "*://twitter.com/*",

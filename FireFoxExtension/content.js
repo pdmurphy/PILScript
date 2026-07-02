@@ -118,6 +118,36 @@ function getBlueskyPostData() {
   return { text, hasVideo, hasImage, isQuote, url };
 }
 
+function getYouTubeData() {
+  const url = window.location.href;
+
+  const rawTitle = document.querySelector('meta[property="og:title"]')?.content || "";
+  const duration = document.querySelector('meta[itemprop="duration"]')?.content || "";
+
+  if (!rawTitle || !duration) {
+    return { error: "Could not find video data on page." };
+  }
+
+  // og:title sometimes has " - YouTube" appended depending on page context
+  const title = rawTitle.replace(/\s*-\s*YouTube\s*$/, "").trim();
+
+  // ISO 8601 duration (e.g. PT1H2M35S) -> "1:02:35" or "29:35"
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) {
+    return { error: "Could not parse video duration." };
+  }
+  const hours   = parseInt(match[1] || "0");
+  const minutes = parseInt(match[2] || "0");
+  const seconds = parseInt(match[3] || "0");
+
+  const pad = n => String(n).padStart(2, "0");
+  const timestamp = hours > 0
+    ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+    : `${minutes}:${pad(seconds)}`;
+
+  return { title, timestamp, url };
+}
+
 //Listen for message from popup
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "getPostData") {
@@ -126,5 +156,7 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse(getTweetData());
   } else if (msg.action === "getBlueskyData") {
     sendResponse(getBlueskyPostData());
+  } else if (msg.action === "getYouTubeData") {
+    sendResponse(getYouTubeData());
   }
 });

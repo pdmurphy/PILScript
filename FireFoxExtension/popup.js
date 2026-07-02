@@ -54,6 +54,13 @@ function formatBlueskyResult(post) {
   return `${prefix}${text} ${pageUrl}`;
 }
 
+function formatYouTubeResult(video) {
+  const title     = video.title || "";
+  const timestamp = video.timestamp || "";
+  const pageUrl   = video.url;
+
+  return `${title} [${timestamp}] ${pageUrl}`;
+}
 
 function formatResult(post) {
   const title    = post.title || "Unknown Title";
@@ -84,10 +91,11 @@ async function run() {
 
   const isReddit  = /reddit\.com\/r\/[^/]+\/comments\//.test(tab.url);
   const isTwitter = /(twitter\.com|x\.com)\/[^/]+\/status\//.test(tab.url);
-   const isBluesky = /bsky\.app\/profile\/[^/]+\/post\//.test(tab.url);
+  const isBluesky = /bsky\.app\/profile\/[^/]+\/post\//.test(tab.url);
+  const isYouTube = /youtube\.com\/watch\?.*v=/.test(tab.url);
 
-  if (!isReddit && !isTwitter && !isBluesky) {
-    statusEl.textContent = "Not a Reddit post or Tweet, or Bluesky post page.";
+  if (!isReddit && !isTwitter && !isBluesky && !isYouTube) {
+    statusEl.textContent = "Not a Reddit post, Tweet, Bluesky post, or YouTube video page.";
     statusEl.className = "error";
     return;
   }
@@ -98,8 +106,10 @@ async function run() {
     action = "getPostData";
   } else if (isTwitter) {
     action = "getTweetData";
-  } else {
+  } else if (isBluesky) {
     action = "getBlueskyData";
+  } else {
+    action = "getYouTubeData";
   }
 
   let data;
@@ -122,8 +132,10 @@ async function run() {
     formatted = formatResult(data);
   } else if (isTwitter) {
     formatted = formatTweetResult(data);
-  } else {
+  } else if (isBluesky) {
     formatted = formatBlueskyResult(data);
+  } else {
+    formatted = formatYouTubeResult(data);
   }
 
   try {
