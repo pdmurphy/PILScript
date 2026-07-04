@@ -32,7 +32,6 @@ function formatTweetResult(tweet) {
   return `${prefix}${text} ${pageUrl}`;
 }
 
-
 function formatBlueskyResult(post) {
   const text     = post.text || "";
   const hasVideo = post.hasVideo || false;
