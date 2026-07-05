@@ -58,8 +58,12 @@ function getTweetData() {
     return { error: "Could not find tweet on page. Try waiting for it to load." };
   }
 
-  //this is the main tweet (not quote-tweet/replies below it)
-  const article = articles[0];
+  // Find the article matching the current status ID in the page URL.
+  // Can't just use articles[0] as if the tweet is a reply it wont be [0].
+  const statusId = window.location.pathname.match(/status\/(\d+)/)?.[1];
+  const article = statusId
+    ? Array.from(articles).find(a => a.querySelector(`a[href*="/status/${statusId}"]`))
+    : articles[0]; // fallback to first if URL doesn't have a status ID for some reason
 
   //console.log(article.outerHTML); //used for debugging
 
