@@ -100,25 +100,65 @@ function getTweetData() {
 // AND a quote) - confirmed against a real recordWithMedia example.
 function getBlueskyPostData() {
   const url = window.location.href;
- 
+
   const ogImage = document.querySelector('meta[property="og:image"]')?.content || "";
   const ogVideo = document.querySelector('meta[property="og:video"]')?.content || "";
   const ogDesc  = document.querySelector('meta[property="og:description"]')?.content || "";
- 
-  if (!ogDesc) {
-    return { error: "Could not find post data on page." };
-  }
- 
-  const QUOTE_MARKER = "[contains quote post or other embedded content]";
-  const isQuote = ogDesc.includes(QUOTE_MARKER);
- 
-  // Strip the marker (and the blank line bskyweb puts before it) back out of
-  // the description so it isn't included as if it were part of the post text.
-  const text = ogDesc.replace(/\s*\n\s*/g, " | ").replace(QUOTE_MARKER, "").trim();
 
-  const hasVideo = !!ogVideo;
-  const hasImage = !hasVideo && ogImage.includes("/feed_thumbnail/");
- 
+  const QUOTE_MARKER = "[contains quote post or other embedded content]";
+  const LOCKED_MARKER = "This author has chosen to make their posts visible only to people who are signed in.";
+
+  // Public post — use og: tags (fast, reliable, no DOM needed)
+  if (ogDesc && !ogDesc.includes(LOCKED_MARKER)) {
+    const isQuote  = ogDesc.includes(QUOTE_MARKER);
+    const text     = ogDesc.replace(QUOTE_MARKER, "").replace(/\s*\n\s*/g, " | ").trim();
+    const hasVideo = !!ogVideo;
+    const hasImage = !hasVideo && ogImage.includes("/feed_thumbnail/");
+    return { text, hasVideo, hasImage, isQuote, url };
+  }
+
+  // Followers-only post — fall back to reading the live DOM
+  const handle = url.match(/profile\/([^/]+)\/post/)?.[1];
+  if (!handle) return { error: "Could not find post data on page." };
+
+  const post = document.querySelector(`[data-testid="postThreadItem-by-${handle}"]`);
+  if (!post) return { error: "Could not find post data on page. Try waiting for it to load." };
+
+  const quoteEl = post.querySelector('div[role="link"]');
+  const isQuote  = !!quoteEl;
+
+  const hasVideo = !![...post.querySelectorAll("video, [data-testid='previewInterstitial']")]
+    .some(el => !quoteEl?.contains(el));
+
+  const hasImage = !hasVideo && [...post.querySelectorAll("img[src*='feed_thumbnail']")]
+    .some(img => !quoteEl?.contains(img));
+
+  // Find handle div as position anchor to exclude display name above it
+  const UI_STRINGS = new Set([
+    "Follow", "Unfollow",
+    "Everybody can reply", "Nobody can reply", "Mentioned accounts can reply"
+  ]);
+
+  const handleDiv = [...post.querySelectorAll('div')].find(d =>
+    d.children.length === 0 &&
+    new RegExp(`@${handle}`).test(d.textContent)
+  );
+
+  const textNodes = [...post.querySelectorAll('div')].filter(d => {
+    if (d.children.length !== 0) return false;
+    if (quoteEl?.contains(d)) return false;
+    if (handleDiv && !(handleDiv.compareDocumentPosition(d) & Node.DOCUMENT_POSITION_FOLLOWING)) return false;
+    const t = d.textContent.trim();
+    if (t.length === 0) return false;
+    if (UI_STRINGS.has(t)) return false;
+    if (/^[\u200e\u200f\u202a\u202c]*@\S+[\u200e\u200f\u202a\u202c]*$/.test(t)) return false;
+    if (/\d:\d\d\s*(AM|PM)/.test(t)) return false;
+    if (/^\d+(\.\d+)?[KM]?$/.test(t)) return false;
+    return true;
+  });
+
+  const text = textNodes.map(d => d.textContent.trim()).join(" | ");
+
   return { text, hasVideo, hasImage, isQuote, url };
 }
 
