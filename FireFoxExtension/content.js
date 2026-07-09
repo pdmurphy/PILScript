@@ -110,8 +110,8 @@ function getBlueskyPostData() {
 
   // Public post — use og: tags (fast, reliable, no DOM needed)
   if (ogDesc && !ogDesc.includes(LOCKED_MARKER)) {
-    const isQuote  = ogDesc.includes(QUOTE_MARKER);
-    const text     = ogDesc.replace(QUOTE_MARKER, "").replace(/\s*\n\s*/g, " | ").trim();
+    const isQuote = ogDesc.includes(QUOTE_MARKER);
+    const text = ogDesc.replace(QUOTE_MARKER, "").replace(/\s*\n\s*/g, " | ").trim();
     const hasVideo = !!ogVideo;
     const hasImage = !hasVideo && ogImage.includes("/feed_thumbnail/");
     return { text, hasVideo, hasImage, isQuote, url };
@@ -157,7 +157,7 @@ function getBlueskyPostData() {
     return true;
   });
 
-  const text = textNodes.map(d => d.textContent.trim()).join(" | ");
+  const text = textNodes.map(d => d.textContent.trim().replace(/\s*\n\s*/g, " | ")).join(" | ");
 
   return { text, hasVideo, hasImage, isQuote, url };
 }
