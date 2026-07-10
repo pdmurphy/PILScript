@@ -154,6 +154,7 @@ function getBlueskyPostData() {
     if (/^[\u200e\u200f\u202a\u202c]*@\S+[\u200e\u200f\u202a\u202c]*$/.test(t)) return false;
     if (/\d:\d\d\s*(AM|PM)/.test(t)) return false;
     if (/^\d+(\.\d+)?[KM]?$/.test(t)) return false;
+    if (/^\d+:\d\d[\d:]* \/ \d+:\d\d[\d:]*$/.test(t)) return false;  // this is if video post has no text the length of video will be here instead of text.
     return true;
   });
 
