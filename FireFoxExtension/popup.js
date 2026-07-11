@@ -50,7 +50,7 @@ function formatBlueskyResult(post) {
     prefix = "[quote] " + prefix;
   }
  
-  return `${prefix}${text} ${pageUrl}`;
+  return text ? `${prefix}${text} ${pageUrl}` : `${prefix}${pageUrl}`;
 }
 
 function formatYouTubeResult(video) {
