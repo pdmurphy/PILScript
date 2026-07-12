@@ -121,7 +121,12 @@ function getBlueskyPostData() {
   const handle = url.match(/profile\/([^/]+)\/post/)?.[1];
   if (!handle) return { error: "Could not find post data on page." };
 
-  const post = document.querySelector(`[data-testid="postThreadItem-by-${handle}"]`);
+  //use the url to make sure the correct text/info is chosen if it is a reply and not just choose the top post.
+  const rkey = url.match(/post\/([^/]+)/)?.[1];
+  const allPosts = [...document.querySelectorAll(`[data-testid="postThreadItem-by-${handle}"]`)];
+  const post = rkey
+    ? allPosts.find(el => el.querySelector(`a[href*="${rkey}"]`))
+    : allPosts[0]; // fallback to top if rkey not found for some reason
   if (!post) return { error: "Could not find post data on page. Try waiting for it to load." };
 
   const quoteEl = post.querySelector('div[role="link"]');
