@@ -69,11 +69,10 @@ function getTweetData() {
 
   const textEl = article.querySelector("[data-testid='tweetText']") ||
                  article.querySelector("div[lang]");
-  if (!textEl) {
-    return { error: "Could not find tweet text on page." };
-  }
+  
   //Use textContent instead of innerText to help about line break issues.
-  const text = textEl.textContent.replace(/\s*\n\s*/g, " | ").trim();
+  //also does a check that if the post has no text it's also okay (textless image or video post)
+  const text = textEl ? textEl.textContent.replace(/\s*\n\s*/g, " | ").trim() : "";
 
   //<video> tag only mounts once playback starts - before that,
   //Twitter shows a "previewInterstitial" thumbnail with a play button.

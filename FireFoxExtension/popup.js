@@ -29,7 +29,7 @@ function formatTweetResult(tweet) {
     prefix = "[quotetweet] " + prefix;
   }
 
-  return `${prefix}${text} ${pageUrl}`;
+  return text ? `${prefix}${text} ${pageUrl}` : `${prefix}${pageUrl}`;
 }
 
 function formatBlueskyResult(post) {
