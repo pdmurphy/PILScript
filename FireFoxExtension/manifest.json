@@ -27,7 +27,8 @@
         "*://*.reddit.com/*",
         "*://*.old.reddit.com/*",
         "*://twitter.com/*",
-        "*://x.com/*"
+        "*://x.com/*",
+        "*://*.twitch.tv/*"
       ],
       "js": ["content.js"]
     }

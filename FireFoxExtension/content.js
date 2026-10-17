@@ -197,6 +197,22 @@ function getYouTubeData() {
   return { title, timestamp, url };
 }
 
+function getTwitchClipData() {
+  const url = window.location.href;
+
+  const ogTitle = document.querySelector('meta[property="og:title"]')?.content || "";
+
+  if (!ogTitle) {
+    return { error: "Could not find clip data on page." };
+  }
+
+  // the og:title format is "CLIP TITLE - StreamerName on Twitch"
+  // so remove the on twitch portion
+  const title = ogTitle.replace(/\s+on Twitch\s*$/, "").trim();
+
+  return { title, url };
+}
+
 //Listen for message from popup
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "getPostData") {
@@ -207,5 +223,7 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse(getBlueskyPostData());
   } else if (msg.action === "getYouTubeData") {
     sendResponse(getYouTubeData());
+  } else if (msg.action === "getTwitchData") {
+   sendResponse(getTwitchClipData());
   }
 });

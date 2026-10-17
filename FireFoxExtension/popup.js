@@ -61,6 +61,13 @@ function formatYouTubeResult(video) {
   return `${title} [${timestamp}] ${pageUrl}`;
 }
 
+function formatTwitchResult(clip) {
+  const title  = clip.title || "";
+  const pageUrl = clip.url;
+
+  return title ? `[clip] ${title} ${pageUrl}` : `[clip] ${pageUrl}`;
+}
+
 function formatResult(post) {
   const title    = post.title || "Unknown Title";
   const linkHref = post.linkHref || "";
@@ -92,9 +99,10 @@ async function run() {
   const isTwitter = /(twitter\.com|x\.com)\/[^/]+\/status\//.test(tab.url);
   const isBluesky = /bsky\.app\/profile\/[^/]+\/post\//.test(tab.url);
   const isYouTube = /youtube\.com\/watch\?.*v=/.test(tab.url);
+  const isTwitch = /twitch\.tv\/[^/]+\/clip\//.test(tab.url);
 
-  if (!isReddit && !isTwitter && !isBluesky && !isYouTube) {
-    statusEl.textContent = "Not a Reddit post, Tweet, Bluesky post, or YouTube video page.";
+  if (!isReddit && !isTwitter && !isBluesky && !isYouTube && !isTwitch) {
+    statusEl.textContent = "Not a Reddit post, Tweet, Bluesky post, YouTube video page, or Twitch clip.";
     statusEl.className = "error";
     return;
   }
@@ -107,9 +115,12 @@ async function run() {
     action = "getTweetData";
   } else if (isBluesky) {
     action = "getBlueskyData";
-  } else {
+  } else if (isYouTube) {
     action = "getYouTubeData";
+  } else {
+    action = "getTwitchData";
   }
+
 
   let data;
   try {
@@ -133,8 +144,10 @@ async function run() {
     formatted = formatTweetResult(data);
   } else if (isBluesky) {
     formatted = formatBlueskyResult(data);
-  } else {
+  } else if (isYouTube) {
     formatted = formatYouTubeResult(data);
+  } else {
+    formatted = formatTwitchResult(data);
   }
 
   try {
