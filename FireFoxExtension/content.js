@@ -197,6 +197,22 @@ function getYouTubeData() {
   return { title, timestamp, url };
 }
 
+//  Youtube shorts info gathering function
+function getYouTubeShortData() {
+  const url = window.location.href;
+
+  const title = document.title
+    .replace(/^\(\d+\)\s*/, "")
+    .replace(/\s*-\s*YouTube\s*$/, "")
+    .trim();
+
+  if (!title) {
+    return { error: "Could not find short title on page." };
+  }
+
+  return { title, url };
+}
+
 function getTwitchClipData() {
   const url = window.location.href;
 
@@ -225,5 +241,7 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse(getYouTubeData());
   } else if (msg.action === "getTwitchData") {
    sendResponse(getTwitchClipData());
+  } else if (msg.action === "getYouTubeShortData") {
+  sendResponse(getYouTubeShortData());
   }
 });
